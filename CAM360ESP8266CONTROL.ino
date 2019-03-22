@@ -6,6 +6,7 @@
 
 
 // pin config
+int buzzerPin = D2;
 const int buttonPin = D3;
 Bounce debouncer = Bounce();
 #define servo_tilt D4
@@ -44,6 +45,7 @@ void setup() {
   Serial.println("STARTUP");
   delay(100);
 
+  pinMode(buzzerPin, OUTPUT);  // active buzzer
   pinMode(BUILTIN_LED, OUTPUT);  // initialize onboard LED as output
   digitalWrite(BUILTIN_LED, HIGH);   // turn off LED with voltage LOW
   pinMode(buttonPin, INPUT_PULLUP);  // button
@@ -68,8 +70,8 @@ void setup() {
   connectToCamera();
 
   // LED green on - init started
-    strip.setPixelColor(0,green);
-    strip.show();
+  strip.setPixelColor(0,green);
+  strip.show();
 }
 
 void searchCamera() {
@@ -155,7 +157,7 @@ void loop() {
 	    if (debouncer.fell()) {
 	    String token = requestToken();
 	    if (token.length() != 0) {
-	      TakePhoto(token);
+	      TakePhoto(token); Beep();
 	    	}
 
 	    }
@@ -175,4 +177,12 @@ void TakePhoto(String token) {
     response.concat(character);
   }
   Serial.println(response);
+}
+
+void Beep () {
+
+  digitalWrite (buzzerPin, HIGH);
+  delay (500);
+  digitalWrite (buzzerPin, LOW);
+  delay (500);
 }
