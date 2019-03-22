@@ -4,8 +4,7 @@
 #include "DRV8825.h"
 #include "Bounce2.h"
 
-
-// pin config
+	// pin config
 int buzzerPin = D2;
 const int buttonPin = D3;
 Bounce debouncer = Bounce();
@@ -13,15 +12,14 @@ Bounce debouncer = Bounce();
 #define DIR D5
 #define STEP D6
 
-// motor config
+	// motor config
 #define MOTOR_STEPS 200
 #define RPM 160
 #define MICROSTEPS 1
 Servo tilt;
 DRV8825 stepper(MOTOR_STEPS, DIR, STEP);
 
-// RGB config
-
+	// RGB config
 const uint16_t PixelCount = 1;
 const uint8_t PixelPin = D1; // pin RGB diode Din
 #define colorSaturation 128
@@ -40,36 +38,29 @@ WiFiClient client;
 String YI_SSID;
 
 void setup() {
-  // startup process
+	// startup process
   Serial.begin(115200);
   Serial.println("STARTUP");
   delay(100);
-
   pinMode(buzzerPin, OUTPUT);  // active buzzer
   pinMode(BUILTIN_LED, OUTPUT);  // initialize onboard LED as output
   digitalWrite(BUILTIN_LED, HIGH);   // turn off LED with voltage LOW
   pinMode(buttonPin, INPUT_PULLUP);  // button
   debouncer.attach(buttonPin); debouncer.interval(50);
-
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
-
-  // LED red on - init started
+	// LED red on - init started
   strip.setPixelColor(0,red);
   strip.show();
-
-  // stepper settings
+	// stepper settings
   stepper.begin(RPM, MICROSTEPS);
   stepper.enable();
-
-  // init servo
+	// init servo
   tilt.attach(servo_tilt);
   tilt.write(90);
-
   searchCamera();
   connectToCamera();
-
-  // LED green on - init started
+	// LED green on - init started
   strip.setPixelColor(0,green);
   strip.show();
 }
@@ -94,7 +85,7 @@ void searchCamera() {
 
 void connectToCamera() {
   bool result = true;
-  short retry = 30;
+  short retry = 60;
   const int jsonPort = 7878;
   char password[11] = "1234567890";
   char ssid[30];
@@ -111,20 +102,18 @@ void connectToCamera() {
   }
   Serial.print(" -> wifi con:");
   if (result == true) Serial.print("OK "); else Serial.print("XX ");
-
   if (!client.connect("192.168.42.1", jsonPort)) result = false;
   Serial.print(" IP con:");
   if (result == true) Serial.print("OK."); else Serial.print("XX.");
   Serial.println();
-
 }
 
-// request
+	// request
 String requestToken() {
 
   client.print("{\"msg_id\":257,\"token\":0}\n\r");
 
-  // Give the server time to respond, then read the entire reply
+	// Give the server time to respond, then read the entire reply
   yield(); delay(250); yield(); delay(250); yield(); delay(250); yield(); delay(250);
   String response;
   while (client.available()) {
@@ -132,7 +121,7 @@ String requestToken() {
     response.concat(character);
   }
 
-  // Search for token in the response
+	// Search for token in the response
 
   String searchString = "\"param\":";
   int offset = response.indexOf(searchString);
@@ -166,7 +155,7 @@ void loop() {
 
 void TakePhoto(String token) {
 
-  client.print("{\"msg_id\":769,\"token\":");
+	client.print("{\"msg_id\":769,\"token\":");
   client.print(token);
   client.print("}\n\r");
   Serial.print("Photo - Response: ");
@@ -185,4 +174,5 @@ void Beep () {
   delay (500);
   digitalWrite (buzzerPin, LOW);
   delay (500);
+  yield();
 }
